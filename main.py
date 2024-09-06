@@ -17,64 +17,71 @@ CHAR_UUID = "00001524-0000-1000-8000-00805f9b34fb"
 TIME_RECEIVING = 10.0
 BYTES_RECEIVED = 0
 
-# TARGET_UUID = []
 
 def device_found(device: BLEDevice, advertisement_data: AdvertisementData):
-    logger.info("{} : {}".format(device.address, advertisement_data))
+    """Callback when a device is found during scanning."""
+    logger.info(f"{device.address} : {advertisement_data}")
 
 
 def notification_handler(characteristic: BleakGATTCharacteristic, data: bytearray):
+    """Notification handler which processes the data received."""
     global BYTES_RECEIVED
-    """Simple notification handler which prints the data received."""
-    logger.info("%s: %r", characteristic.description, data)
-    BYTES_RECEIVED = BYTES_RECEIVED + len(bytearray)
+    logger.info(f"{characteristic.description}: {data}")
+    BYTES_RECEIVED += len(data)
 
 
 def calculate_throughput():
-    return (BYTES_RECEIVED / TIME_RECEIVING)
+    """Calculate the throughput based on bytes received and time."""
+    return BYTES_RECEIVED / TIME_RECEIVING
 
 
 async def main():
-    logger.info("starting scan...")
+    logger.info("Starting scan...")
 
-    devices = await BleakScanner.discover(
-        return_adv=True,
-        service_uuids=[SERVICE_UUID,],
-        cb=dict(use_bdaddr=False),
-    )
-    for d, a in devices.values():
-        print()
-        print(d)
-        print("-" * len(str(d)))
-        print(a)
-        if a.service_uuids[0] == SERVICE_UUID:
-            device = DEVICE_UUID
+    device = None
 
-    logger.info("connecting to device...")
+    try:
+        devices = await BleakScanner.discover(
+            return_adv=True,
+            service_uuids=[SERVICE_UUID],
+            cb=dict(use_bdaddr=False),
+        )
+        for d, a in devices.values():
+            print(d)
+            print("-" * len(str(d)))
+            print(a)
+            if SERVICE_UUID in a.service_uuids:
+                device = d
 
-    async with BleakClient(device) as client:
-        logger.info("Connected")
+        if device is None:
+            logger.error("No device found with the specified service UUID.")
+            return
 
-        for service in client.services:
-            logger.info("service uuid '%s', metadata: '%s", service.uuid, service)
+        logger.info("Connecting to device...")
 
-            for characteristic in service.characteristics:
-                logger.info("characteristic: %s; uuid: '%s", characteristic, characteristic.uuid)
+        async with BleakClient(device) as client:
+            logger.info("Connected")
 
-            # value = await client.read_gatt_char(CHAR_UUID)
-            # print(value)
+            for service in client.services:
+                logger.info(f"Service UUID: {service.uuid}, Metadata: {service}")
 
-        await asyncio.sleep(600.0)
+                for characteristic in service.characteristics:
+                    logger.info(f"Characteristic: {characteristic}, UUID: {characteristic.uuid}")
 
-    throughput = calculate_throughput()
-    logger.info("Calculated throughput: {}".format(throughput))
-    print("finish program")
+            await asyncio.sleep(TIME_RECEIVING)
+
+        throughput = calculate_throughput()
+        logger.info(f"Calculated throughput: {throughput}")
+
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+
+    print("Finish program")
 
 
 if __name__ == '__main__':
-    log_level = logging.INFO
     logging.basicConfig(
-        level=log_level,
+        level=logging.INFO,
         format="%(asctime)-15s %(name)-8s %(levelname)s: %(message)s",
     )
 
