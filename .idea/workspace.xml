@@ -111,6 +111,7 @@
       <workItem from="1724162018626" duration="391000" />
       <workItem from="1724162414890" duration="807000" />
       <workItem from="1725605535587" duration="303000" />
+      <workItem from="1725605887207" duration="148000" />
     </task>
     <task id="LOCAL-00001" summary="add .gitignore, add comments">
       <option name="closed" value="true" />
@@ -120,7 +121,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725605795003</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add README">
+      <option name="closed" value="true" />
+      <created>1725606030215</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1725606030215</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,7 +149,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
     <MESSAGE value="add .gitignore, add comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="add .gitignore, add comments" />
+    <MESSAGE value="add README" />
+    <option name="LAST_COMMIT_MESSAGE" value="add README" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BluetoothPerformanceCheck$main.coverage" NAME="main Coverage Results" MODIFIED="1725605763956" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
