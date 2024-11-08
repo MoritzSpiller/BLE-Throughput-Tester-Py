@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 
 # UUIDs Nordic Throughput Service
 DEVICE_UUID = "12175CC3-79B6-0CAE-584B-2524E46EC07B"
-SERVICE_UUID = "0483dadd-6c9d-6ca9-5d41-03ad4fff4abb"
-CHAR_UUID = "00001524-0000-1000-8000-00805f9b34fb"
+SERVICE_UUID = "e9ea0001-e19b-482d-9293-c7907585fc48"
+CHAR_UUID = "e9ea0002-e19b-482d-9293-c7907585fc48"
 
 # Application parameters
-TIME_RECEIVING = 10.0
+TIME_RECEIVING = 30.0
 BYTES_RECEIVED = 0
 
 
@@ -26,7 +26,6 @@ def device_found(device: BLEDevice, advertisement_data: AdvertisementData):
 def notification_handler(characteristic: BleakGATTCharacteristic, data: bytearray):
     """Notification handler which processes the data received."""
     global BYTES_RECEIVED
-    logger.info(f"{characteristic.description}: {data}")
     BYTES_RECEIVED += len(data)
 
 
@@ -58,6 +57,7 @@ async def main():
             return
 
         logger.info("Connecting to device...")
+        notifiy_char = None
 
         async with BleakClient(device) as client:
             logger.info("Connected")
@@ -67,11 +67,16 @@ async def main():
 
                 for characteristic in service.characteristics:
                     logger.info(f"Characteristic: {characteristic}, UUID: {characteristic.uuid}")
+                    if characteristic.uuid == CHAR_UUID:
+                        notifiy_char = characteristic
+                        await client.start_notify(characteristic, notification_handler)
 
             await asyncio.sleep(TIME_RECEIVING)
+            await client.stop_notify(notifiy_char)
+            await client.disconnect()
 
         throughput = calculate_throughput()
-        logger.info(f"Calculated throughput: {throughput}")
+        logger.info(f"Calculated throughput: {throughput} bytes per second")
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
